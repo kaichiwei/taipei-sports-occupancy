@@ -216,7 +216,7 @@ def parse_text(site: dict, text: str) -> dict:
     return metrics
 
 
-def build_table(record: dict) -> None:
+def build_table(record: dict) -> Table:
     table = Table(box=None, title=f"{record["name_zh"]} {record["name_en"]}", 
                   title_style="bold white on gray23", show_footer=True)
     table.add_column("設施 Facility", justify="center")
