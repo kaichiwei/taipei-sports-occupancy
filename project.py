@@ -164,7 +164,7 @@ def parse_json(site: dict, data: dict) -> dict:
             # key_map = {"gym": "gym", "swim": "pool", "ice": "rink"}
             for k in data:
                 if key := METRIC_BY_CATEGORY.get(k):
-                    metrics[key] = data.get(k)[:2]
+                    metrics[key] = data[k][:2]
     
         case "xports":
             # data = {
@@ -173,7 +173,7 @@ def parse_json(site: dict, data: dict) -> dict:
             #       {"courtCatTitle":"體適能中心","upperBound":60,"currCapacity":16,"capacityControl":1}]}
             for court in data["data"]:
                 if key := METRIC_BY_CATEGORY.get(court["courtCatTitle"]):
-                    metrics[key] = [court.get("currCapacity"), court.get("upperBound")]
+                    metrics[key] = [court["currCapacity"], court["upperBound"]]
 
     metrics = {k: [to_int(x) for x in v] for k, v in metrics.items()}
     return metrics
