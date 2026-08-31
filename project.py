@@ -8,7 +8,7 @@ import json
 import re
 from sys import stderr
 import time
-from typing import Iterator
+from typing import Any, Iterator
 from pathlib import Path
 from collections import defaultdict
 
@@ -101,7 +101,7 @@ def match_sites(queries: list[str], all_sites: list[dict]) -> tuple[list[dict], 
 
 
 # 分辨是哪個獲取方式並回傳資料
-def fetch(site: dict) -> str | dict:
+def fetch(site: dict) -> str | dict[str, Any]:
     match site["mode"]:
         case "json":
             match site["name_zh"]:
@@ -140,6 +140,8 @@ def fetch(site: dict) -> str | dict:
             response.raise_for_status()
             response.encoding = "utf-8"
             return response.text  # html 和 text 都回字串
+        case _:
+            raise NotImplementedError(f"未實作的 mode: {site['mode']!r}")
 
 
 # 將字串數字轉成 int，轉不動就回 None,不讓整支 scraper 掛掉。
