@@ -48,15 +48,15 @@ def main():
         current_time = time.strftime("%Y-%m-%d %H:%M:%S")
         try:
             data = fetch(site)
-            match site["mode"]:
-                case "json":
+            match site["mode"], data:
+                case "json", dict():
                     metrics = parse_json(site, data)
-                case "html":
+                case "html", str():
                     metrics = parse_html(site, data)
-                case "text":
+                case "text", str():
                     metrics = parse_text(site, data)
                 case _:
-                    raise NotImplementedError(f"未實作的 mode: {site['mode']!r}")
+                    raise NotImplementedError(f"mode {site['mode']!r} 與回應型別 {type(data).__name__} 不相符")
         except NotImplementedError as e:
             print(f"{site['name_zh']} 設定不完整: {e}", file=stderr)
             continue
