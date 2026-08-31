@@ -14,7 +14,7 @@ from collections import defaultdict
 
 import requests
 from rich.console import Console
-from rich.progress import ProgressBar
+from rich.progress_bar import ProgressBar
 from rich.table import Table
 
 import sites
