@@ -153,7 +153,9 @@ def to_int(value) -> int | None:
 
 
 def parse_json(site: dict, data: dict) -> dict:
-    metrics = {"gym": [None, None], "pool": [None, None], "rink": [None, None]}
+    metrics: dict[str, list[str | int | None]] = {
+        "gym": [None, None], "pool": [None, None], "rink": [None, None]
+    }
 
     match site["operator"]:
         case "cce" | "ymca" | "far_east_steel" | "cyc":
@@ -180,7 +182,9 @@ def parse_json(site: dict, data: dict) -> dict:
 
 
 def parse_html(site: dict, html: str) -> dict:
-    metrics = {"gym": [None, None], "pool": [None, None], "rink": [None, None]}
+    metrics: dict[str, list[str | int | None]] = {
+        "gym": [None, None], "pool": [None, None], "rink": [None, None]
+    }
 
     if site["operator"] == "Fullhouse": 
         if not (m := re.search(site["pattern"], html)):
@@ -203,7 +207,9 @@ def parse_html(site: dict, html: str) -> dict:
 
 
 def parse_text(site: dict, text: str) -> dict:
-    metrics = {"gym": [None, None], "pool": [None, None], "rink": [None, None]}
+    metrics: dict[str, list[str | int | None]] = {
+        "gym": [None, None], "pool": [None, None], "rink": [None, None]
+    }
     
     match site["name_zh"]:
         case "新莊":
