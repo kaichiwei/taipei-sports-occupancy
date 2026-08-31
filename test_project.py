@@ -2,7 +2,7 @@ import csv
 
 import pytest
 
-import list_sport_centers
+import sites
 import project
 from project import (
     parse_queries,
@@ -16,7 +16,7 @@ from project import (
 )
 
 
-SITES = list_sport_centers.SITES
+SITES = sites.SITES
 
 
 #  -------------------  test parse_queries() -----------------

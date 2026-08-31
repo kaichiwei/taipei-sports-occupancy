@@ -17,7 +17,7 @@ from rich.console import Console
 from rich.progress import ProgressBar
 from rich.table import Table
 
-import list_sport_centers
+import sites
 
 
 METRIC_BY_CATEGORY = {
@@ -29,7 +29,7 @@ HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 }
 
-ALL_SITES = list_sport_centers.SITES
+ALL_SITES = sites.SITES
 
 SUFFIXES_ZH = ["", "運動中心", "國民運動中心"]
 SUFFIXES_EN = ["", " Sport Center", " Civil Sport Center"]
