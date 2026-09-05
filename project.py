@@ -253,7 +253,7 @@ def print_to_cla(unknown_terms, records) -> None:
                     table.add_row(f"{key.get(metric)} {metric}", f"{cur:>4}", "-", "-",)
                 else:
                     ratio = cur / cap
-                    style = "green3" if ratio < 0.2 else "yellow" if ratio < 0.5 else "red" if ratio < 1 else "dark_magenta"
+                    style = "green3" if ratio < 0.3 else "yellow" if ratio < 0.6 else "red" if ratio < 1 else "dark_magenta"
                     table.add_row(
                         f"{key.get(metric)} {metric}", 
                         f"{cur:>4}",
