@@ -264,16 +264,16 @@ RECORD = {
     "city": "NTPC",
     "name_zh": "中和",
     "name_en": "Zhonghe",
-    "metrics": {"gym": [44, 100], "pool": [3, 150], "rink": [None, None]},
+    "facilities": {"gym": [44, 100], "pool": [3, 150], "rink": [None, None]},
 }
 
 
-def test_to_rows_yields_one_row_per_metric():
+def test_to_rows_yields_one_row_per_facility():
     base = {"timestamp": "2026-08-21 10:00:00", "city": "NTPC", "name_zh": "中和", "name_en": "Zhonghe"}
     assert list(to_rows(RECORD)) == [
-        {**base, "metric": "gym", "current": 44, "capacity": 100},
-        {**base, "metric": "pool", "current": 3, "capacity": 150},
-        {**base, "metric": "rink", "current": None, "capacity": None},
+        {**base, "facility": "gym", "current": 44, "capacity": 100},
+        {**base, "facility": "pool", "current": 3, "capacity": 150},
+        {**base, "facility": "rink", "current": None, "capacity": None},
     ]
 
 
@@ -286,14 +286,14 @@ def make_record(timestamp, city, name_zh, name_en, gym, pool, rink):
     return {
         "timestamp": timestamp, "city": city,
         "name_zh": name_zh, "name_en": name_en,
-        "metrics": {"gym": gym, "pool": pool, "rink": rink},
+        "facilities": {"gym": gym, "pool": pool, "rink": rink},
     }
 
 # 同一個月，資料類別不同
 # 2 rows
-TWO_METRICS = make_record("2026-08-21 10:00:00", "NTPC", "中和", "Zhonghe", [44, 100], [3, 150], [None, None])
+TWO_FACILITIES = make_record("2026-08-21 10:00:00", "NTPC", "中和", "Zhonghe", [44, 100], [3, 150], [None, None])
 # 3 rows
-THREE_METRICS = make_record("2026-08-22 19:58:43", "NTPC", "土城", "Tucheng", [33, 120], [159, 280], [36, 250])
+THREE_FACILITIES = make_record("2026-08-22 19:58:43", "NTPC", "土城", "Tucheng", [33, 120], [159, 280], [36, 250])
 # 2 rows
 NONE_CAP = make_record("2026-08-01 05:16:28", "TPE", "大同", "Datong", [55, None], [116, None], [None, None]
 )
@@ -313,7 +313,7 @@ class TestSaveCSV:
 
     def test_save_to_csv(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
-        save_to_csv([TWO_METRICS, THREE_METRICS, NONE_CAP, NONE_CUR, ZERO_CUR])
+        save_to_csv([TWO_FACILITIES, THREE_FACILITIES, NONE_CAP, NONE_CUR, ZERO_CUR])
         with open(tmp_path / "data" / "log_2026-08.csv", newline="", encoding="utf-8") as f:
             reader = list(csv.DictReader(f))
             assert len(reader) == 9
@@ -323,7 +323,7 @@ class TestSaveCSV:
                     "city": "NTPC",
                     "name_zh": "中和",
                     "name_en": "Zhonghe",
-                    "metric": "gym",
+                    "facility": "gym",
                     "current": "44",
                     "capacity": "100",
                 },
@@ -332,7 +332,7 @@ class TestSaveCSV:
                     "city": "NTPC",
                     "name_zh": "中和",
                     "name_en": "Zhonghe",
-                    "metric": "pool",
+                    "facility": "pool",
                     "current": "3",
                     "capacity": "150",
                 },
@@ -343,7 +343,7 @@ class TestSaveCSV:
                     "city": "NTPC",
                     "name_zh": "土城",
                     "name_en": "Tucheng",
-                    "metric": "gym",
+                    "facility": "gym",
                     "current": "33",
                     "capacity": "120",
                 },
@@ -352,7 +352,7 @@ class TestSaveCSV:
                     "city": "NTPC",
                     "name_zh": "土城",
                     "name_en": "Tucheng",
-                    "metric": "pool",
+                    "facility": "pool",
                     "current": "159", 
                     "capacity": "280",
                 },
@@ -361,7 +361,7 @@ class TestSaveCSV:
                     "city": "NTPC",
                     "name_zh": "土城",
                     "name_en": "Tucheng",
-                    "metric": "rink",
+                    "facility": "rink",
                     "current": "36", 
                     "capacity": "250",
                 },
@@ -372,7 +372,7 @@ class TestSaveCSV:
                     "city": "TPE",
                     "name_zh": "大同",
                     "name_en": "Datong",
-                    "metric": "gym",
+                    "facility": "gym",
                     "current": "55",
                     "capacity": "",
                 },
@@ -381,7 +381,7 @@ class TestSaveCSV:
                     "city": "TPE",
                     "name_zh": "大同",
                     "name_en": "Datong",
-                    "metric": "pool",
+                    "facility": "pool",
                     "current": "116",
                     "capacity": "",
                 },
@@ -392,7 +392,7 @@ class TestSaveCSV:
                     "city": "NTPC",
                     "name_zh": "蘆洲",
                     "name_en": "Luzhou",
-                    "metric": "gym",
+                    "facility": "gym",
                     "current": "0",
                     "capacity": "120",
                 },
@@ -401,7 +401,7 @@ class TestSaveCSV:
                     "city": "NTPC",
                     "name_zh": "蘆洲",
                     "name_en": "Luzhou",
-                    "metric": "pool",
+                    "facility": "pool",
                     "current": "0",
                     "capacity": "250",
                 },
@@ -422,14 +422,14 @@ class TestSaveCSV:
                     {
                         "timestamp": "2026-08-31 23:59:59",
                         "city": "NTPC", "name_zh": "新莊", "name_en": "Xinzhuang",
-                        "metric": "gym",
+                        "facility": "gym",
                         "current": "10",
                         "capacity": "100"
                     },
                     {
                         "timestamp": "2026-08-31 23:59:59",
                         "city": "NTPC", "name_zh": "新莊", "name_en": "Xinzhuang",
-                        "metric": "pool",
+                        "facility": "pool",
                         "current": "20",
                         "capacity": "200"
                     },
@@ -441,14 +441,14 @@ class TestSaveCSV:
                     {
                         "timestamp": "2026-09-01 00:00:01",
                         "city": "NTPC", "name_zh": "新莊", "name_en": "Xinzhuang",
-                        "metric": "gym",
+                        "facility": "gym",
                         "current": "11",
                         "capacity": "100"
                     },
                     {
                         "timestamp": "2026-09-01 00:00:01",
                         "city": "NTPC", "name_zh": "新莊", "name_en": "Xinzhuang",
-                        "metric": "pool",
+                        "facility": "pool",
                         "current": "21",
                         "capacity": "200"
                     },

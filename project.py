@@ -20,7 +20,7 @@ from rich.table import Table
 import sites
 
 
-METRIC_BY_CATEGORY = {
+FACILITY_BY_CATEGORY = {
     "健身房": "gym", "體適能中心": "gym", "游泳池": "pool", "冰宮": "rink",
     "gym": "gym", "swim": "pool", "ice": "rink"
 }
@@ -34,7 +34,7 @@ ALL_SITES = sites.SITES
 SUFFIXES_ZH = ["", "運動中心", "國民運動中心"]
 SUFFIXES_EN = ["", " Sport Center", " Civil Sport Center"]
 
-FIELDNAMES = ["timestamp", "city", "name_zh", "name_en", "metric", "current", "capacity"]
+FIELDNAMES = ["timestamp", "city", "name_zh", "name_en", "facility", "current", "capacity"]
 
 
 def main():
@@ -50,11 +50,11 @@ def main():
             data = fetch(site)
             match site["mode"], data:
                 case "json", dict():
-                    metrics = parse_json(site, data)
+                    facilities = parse_json(site, data)
                 case "html", str():
-                    metrics = parse_html(site, data)
+                    facilities = parse_html(site, data)
                 case "text", str():
-                    metrics = parse_text(site, data)
+                    facilities = parse_text(site, data)
                 case _:
                     raise NotImplementedError(f"mode {site['mode']!r} 與回應型別 {type(data).__name__} 不相符")
         except NotImplementedError as e:
@@ -69,7 +69,7 @@ def main():
         record = {
             "timestamp": current_time,  "city": site["city"], 
             "name_zh": site["name_zh"], "name_en": site["name_en"], 
-            "metrics": metrics,
+            "facilities": facilities,
             "website": site["web"],
         }
         records.append(record)
@@ -153,7 +153,7 @@ def to_int(value) -> int | None:
 
 
 def parse_json(site: dict, data: dict) -> dict:
-    metrics: dict[str, list[str | int | None]] = {
+    facilities: dict[str, list[str | int | None]] = {
         "gym": [None, None], "pool": [None, None], "rink": [None, None]
     }
 
@@ -165,8 +165,8 @@ def parse_json(site: dict, data: dict) -> dict:
             # cyc: data = {"gym":["44","100","0"],"swim":["3","150","0"],"ice":["217","250","0"]}
             # key_map = {"gym": "gym", "swim": "pool", "ice": "rink"}
             for k in data:
-                if key := METRIC_BY_CATEGORY.get(k):
-                    metrics[key] = data[k][:2]
+                if key := FACILITY_BY_CATEGORY.get(k):
+                    facilities[key] = data[k][:2]
     
         case "xports":
             # data = {
@@ -174,40 +174,40 @@ def parse_json(site: dict, data: dict) -> dict:
             #       {"courtCatTitle":"游泳池","upperBound":300,"currCapacity":107,"capacityControl":1},
             #       {"courtCatTitle":"體適能中心","upperBound":60,"currCapacity":16,"capacityControl":1}]}
             for court in data["data"]:
-                if key := METRIC_BY_CATEGORY.get(court["courtCatTitle"]):
-                    metrics[key] = [court["currCapacity"], court["upperBound"]]
+                if key := FACILITY_BY_CATEGORY.get(court["courtCatTitle"]):
+                    facilities[key] = [court["currCapacity"], court["upperBound"]]
 
-    metrics = {k: [to_int(x) for x in v] for k, v in metrics.items()}
-    return metrics
+    facilities = {k: [to_int(x) for x in v] for k, v in facilities.items()}
+    return facilities
 
 
 def parse_html(site: dict, html: str) -> dict:
-    metrics: dict[str, list[str | int | None]] = {
+    facilities: dict[str, list[str | int | None]] = {
         "gym": [None, None], "pool": [None, None], "rink": [None, None]
     }
 
     if site["operator"] == "Fullhouse": 
         if not (m := re.search(site["pattern"], html)):
-            return metrics
+            return facilities
         venues = json.loads(json.loads(m.group(1)))
         # data = [{"MachineName": "游泳池", "MaxQty": 400, "UseQty": 132}, 
         #         {"MachineName": "健身房", "MaxQty": 100, "UseQty": 27}]
         for venue in venues:
-            if key := METRIC_BY_CATEGORY.get(venue["MachineName"]):
-                metrics[key] = [venue.get("UseQty"), venue.get("MaxQty")]
+            if key := FACILITY_BY_CATEGORY.get(venue["MachineName"]):
+                facilities[key] = [venue.get("UseQty"), venue.get("MaxQty")]
     else:
         # PATTERN_CJME = r'(?P<cat>[\u4e00-\u9fa5]+)<span class="stadium-info_number">(?P<cur>\d+)</span>人/ 容留<span>(?P<cap>\d+)人'
         for m in re.finditer(site["pattern"], html):
             field = m.groupdict()
-            if key := METRIC_BY_CATEGORY.get(field["cat"]):
-                metrics[key] = [field.get("cur"), field.get("cap")]
+            if key := FACILITY_BY_CATEGORY.get(field["cat"]):
+                facilities[key] = [field.get("cur"), field.get("cap")]
     
-    metrics = {k: [to_int(x) for x in v] for k, v in metrics.items()}
-    return metrics
+    facilities = {k: [to_int(x) for x in v] for k, v in facilities.items()}
+    return facilities
 
 
 def parse_text(site: dict, text: str) -> dict:
-    metrics: dict[str, list[str | int | None]] = {
+    facilities: dict[str, list[str | int | None]] = {
         "gym": [None, None], "pool": [None, None], "rink": [None, None]
     }
     
@@ -217,11 +217,11 @@ def parse_text(site: dict, text: str) -> dict:
         case "樹林":
             pool_current, gym_current = text.split(",")
         
-    metrics["gym"] = [gym_current, site["CAPACITY"]["gym"]]
-    metrics["pool"] = [pool_current, site["CAPACITY"]["swim"]]
+    facilities["gym"] = [gym_current, site["CAPACITY"]["gym"]]
+    facilities["pool"] = [pool_current, site["CAPACITY"]["swim"]]
 
-    metrics = {k: [to_int(x) for x in v] for k, v in metrics.items()}
-    return metrics
+    facilities = {k: [to_int(x) for x in v] for k, v in facilities.items()}
+    return facilities
 
 
 def build_table(record: dict) -> Table:
@@ -246,16 +246,16 @@ def print_to_cla(unknown_terms, records) -> None:
     console = Console()
     for record in records:
         table = build_table(record)
-        for metric in record["metrics"]:
-            cur, cap = record["metrics"][metric][:2]
+        for facility in record["facilities"]:
+            cur, cap = record["facilities"][facility][:2]
             if cur is not None:
                 if cap is None:
-                    table.add_row(f"{key.get(metric)} {metric}", f"{cur:>4}", "-", "-",)
+                    table.add_row(f"{key.get(facility)} {facility}", f"{cur:>4}", "-", "-",)
                 else:
                     ratio = cur / cap
                     style = "green3" if ratio < 0.3 else "yellow" if ratio < 0.6 else "red" if ratio < 1 else "dark_magenta"
                     table.add_row(
-                        f"{key.get(metric)} {metric}", 
+                        f"{key.get(facility)} {facility}", 
                         f"{cur:>4}",
                         f"{cap:>4}", 
                         ProgressBar(total=cap, completed=cur, width=30, complete_style=style, finished_style="dark_magenta", style="grey42"),
@@ -270,8 +270,8 @@ def print_to_cla(unknown_terms, records) -> None:
 
 def to_rows(record: dict) -> Iterator[dict]:
     base = {k: record[k] for k in ("timestamp", "city", "name_zh", "name_en")}
-    for metric, (cur, cap) in record["metrics"].items():
-        yield {**base, "metric": metric, "current": cur, "capacity": cap}
+    for facility, (cur, cap) in record["facilities"].items():
+        yield {**base, "facility": facility, "current": cur, "capacity": cap}
 
 
 def save_to_csv(records: list[dict]) -> None:
