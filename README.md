@@ -7,15 +7,15 @@ A command-line tool that retrieves live occupancy data from websites of sports c
 
 ## Features
 
-- Fetches real-time facility occupancy data from supported sports centers
-- Displays the data in a color-coded table in the terminal
-- Appends occupancy data to monthly CSV log files for time-series analysis
-- Supports multiple sports centers in a single query
+- Queries multiple sports centers at once
+- Fetches live occupancy data from supported sports centers
+- Displays occupancy data in color-coded terminal tables
+- Appends occupancy data to monthly CSV logs for time-series analysis
 
 
 ## Requirements
 
-- Python 3.12
+- Python 3.14
 
 
 ## Installation
@@ -30,10 +30,10 @@ pip install -r requirements.txt
 Run the program with:
 
 ```bash
-python project.py
+python3 project.py
 ```
 
-When prompted, enter the names of the sports centers you want to check in either Chinese or English. Multiple names have to be separated by any of the following punctuation marks: `，`, `、`, `；`, `,`, `;`.
+When prompted, enter the names of the sports centers you want to check in either Chinese or English. Multiple names need to be separated by any of the following punctuation marks: `，`, `、`, `；`, `,`, `;`.
 
 For example:
 ```text
@@ -43,11 +43,11 @@ For example:
 
 ## Output
 ### CLI table
-The table displays the current occupancy information for the selected sports centers:
+The tables display the current occupancy information for the selected sports centers:
 
 - **Facility**: The facility being monitored, gym, swimming pool, or ice rink.
 - **Current**: The current number of users in this facility.
-- **Capacity**: The maximum number of users allowed in this facility. Displays `-` if capacity data is unavailable.
+- **Capacity**: The maximum capacity of this facility. Displays `-` if capacity data is unavailable.
 - **Occupancy**: The current occupancy rate, calculated as `(current / capacity) × 100%`. The bar is color-coded according to the occupancy rate:
 
         Green: below 30%
@@ -66,12 +66,12 @@ For example:
 
 
 ### Save to CSV
-Each time the program retrieves occupancy data, the results are appended to a monthly CSV log file in the `data/` directory. The destination file is determined by the retrieval timestamp and is named using the format `log_YYYY-MM.csv`. Each facility is stored as a separate row, so a sports center with a gym, swimming pool, and ice rink produces three rows.
+Each time the program retrieves occupancy data, the results are appended to a monthly CSV log file in the `data/` directory. The destination file is determined by the retrieval timestamp, named using the format `log_YYYY-MM.csv`. Each facility is stored as a row, so a sports center with three facilities: gym, swimming pool, and ice rink produces three rows.
 
 The CSV contains the following columns:
 
 - `timestamp`: The time at which the data was retrieved
-- `city`: The city code of the sports center
+- `city`: The city where the sports center is located
 - `name_zh`: The Chinese name of the sports center
 - `name_en`: The English name of the sports center
 - `facility`: The facility type, such as gym, pool, or rink
@@ -118,11 +118,9 @@ Daan, Banqiao, Xindian, Luzhu, Datong, Zhongzheng, Tamsui, Taishan, Yangmei, Son
 ```text
 taipei-sports-occupancy
 ├── README.md
-├── data
-│   ├── log_2026-08.csv
-│   ├── log_2026-09.csv
+├── data/
 │   └── sample_occupancy.csv
-├── docs
+├── docs/
 │   └── example-output.png
 ├── project.py
 ├── requirements.txt
@@ -132,19 +130,19 @@ taipei-sports-occupancy
 
 
 ## Files
-每個檔案「負責什麼」。
+
 ### `README.md`
-### `data/`:
-Stores monthly occupancy log csv files.
-### `docs/`: 
+### `data/`
+Stores monthly occupancy log CSV files.
+### `docs/` 
 Stores documentation assets such as the example output image.
-### `project.py`:
+### `project.py`
 Contains the main program logic, including user input handling, data retrieval, parsing, table rendering, and CSV logging.
-### `requirements.txt`:
+### `requirements.txt`
 Lists the project's Python dependencies.
-### `sites.py`:
-Stores configuration for supported sports centers, including names, located city, URLs, operators, fetch modes, and site-specific parsing information.
-### `test_project.py`:
+### `sites.py`
+Stores configuration for supported sports centers, including cities, names, operators, URLs, fetch modes, and site-specific parsing information.
+### `test_project.py`
 Contains tests for the testable functions in `project.py`.
 
 
@@ -153,54 +151,52 @@ Contains tests for the testable functions in `project.py`.
 
 ### Supporting Multiple Operators and Data Sources
 
-The project currently supports 38 sports centers across five cities and ten operators. Because these operators use different website systems and data formats, the program uses a site-specific configuration layer rather than a single hard-coded scraping method.
+The project currently supports 38 sports centers across five cities and ten operators. Because these operators use different website systems and data formats, the program defines separate data-fetching and parsing rules for each website.
 
-Site-specific information is stored separately in `sites.py`. Each sports center has its own configuration, such as its names, operator, data source, and information required to retrieve or parse its occupancy data. Separating this configuration from the main program logic makes it easier to support sites with different implementations and to add or modify sports centers without rewriting the core workflow in `project.py`.
+Site-specific information is stored in `sites.py`. Each sports center has its own configuration, such as city, names, operator, data source, and information required to retrieve or parse its occupancy data. Separating this configuration from `project.py` makes it easier to support sites with different implementations and to add or modify sports centers without rewriting the main program logic in `project.py`.
 
 
 ### Input Handling
 
-After the user input is split into individual site names, the program separates them into valid and invalid entries. Invalid entries are collected rather than causing the program to stop immediately.
-
-This allows the program to report all unrecognized site names at once and display a list of available sports centers, making it easier for the user to correct the input. Valid site names can still be processed normally.
+After the user input is split, the program classifies the entries as valid or invalid. Invalid entries are collected instead of causing the program to stop immediately. This allows valid site names to be processed normally and enables the program to report all unrecognized site names at once and then display a list of available sports centers.
 
 
 ### Fetching Data
 
-Sites expose their occupancy data in three main ways: JSON APIs, data embedded in HTML, and comma-separated plain text.
+Sites expose their occupancy data in three main ways: JSON APIs, HTML pages, and comma-separated plain text.
 
-Different sports centers operated by the same company may use different website implementations and data formats. For example, CCE uses JSON for Zhonghe Sports Center but HTML for Beitou Sports Center; YMCA also uses JSON for Xinsheng Sports Center but HTML for Shilin Sports Center. Because of this, the program cannot determine the fetching method based on `SITES["operator"]` alone. Instead, each site's `SITES["mode"]` setting in `sites.py` specifies how its data should be retrieved.
+Sites operated by the same operator usually have the same website implementation and data format, but there are exceptions. For example, CCE uses JSON for Zhonghe (中和) Sports Center but HTML for Beitou (北投) Sports Center; YMCA also uses JSON for Xinsheng (新生) Sports Center but HTML for Shilin (士林) Sports Center. Because of this, the fetching method is not based on `SITES["operator"]` alone. Instead, the `SITES["mode"]` setting for each site in `sites.py` specifies how to retrieve its data.
 
-Each site is given its own retrieval timestamp rather than sharing one timestamp across the entire query. Since sites are fetched sequentially, recording a timestamp for each fetch makes the retrieval time more accurate. Facilities returned by the same fetch, such as a gym, pool, and rink from one sports center, share the same timestamp.
+A retrieval timestamp is recorded for each site rather than sharing the same timestamp across the entire query. Since sites are fetched sequentially, this makes the retrieval time more accurate. Facilities returned by the same fetch share the same timestamp.
 
  
 ### Normalizing and Parsing Data
 
-After retrieval, the program may receive occupancy data as JSON, HTML, or plain text. Because these formats have different structures, they cannot be parsed in a single way. Threrefore separate parsing functions are used for the three source formats: `parse_json()`, `parse_html()`, and `parse_text()`.
+After retrieval, the program may receive occupancy data in three different formats: JSON, HTML, or plain text. Different parsing functions are used for these source formats: `parse_json()`, `parse_html()`, and `parse_text()`.
 
-Additional handling is required for HTML-based sites because their page structures are not consistent. Site-specific regular expression patterns are stored in `SITES["pattern"]` in `sites.py`. The parser can use the pattern defined for each site accordingly while keeping the parsing logic generic.
+Additional handling is required for HTML-based sites because each site places and labels its occupancy data differently in the HTML source. Site-specific regular expression patterns are identified by inspecting where the occupancy data appears in each site’s HTML source and then stored in `SITES["pattern"]` in `sites.py`. Therefore, the `parse_html()` function can apply these patterns directly, which keeps the parsing logic generic.
 
-One exception among HTML-based sites is the Fullhouse-operated site. Its HTTP response is HTML, but the relevant occupancy data is embedded as JSON inside the page. The JSON data must therefore be extracted from the HTML first and then parsed.
+One exception among HTML-based sites is the site operated by Fullhouse. Although its HTTP response is HTML, the occupancy data is embedded in the page as JSON. Therefore, the JSON data must first be extracted from the HTML before being parsed.
 
-In each parser, source-specific responses are normalized into the same `facilities` dictionary structure. This allows the rest of the program to render tables and write CSV rows without needing to know whether the original data came from JSON, HTML, or plain text.
+In each parser, source-specific responses are normalized into the same `facilities` dictionary structure. This allows the rest of the program to render tables and write CSV rows without checking whether the data originally came from JSON, HTML, or plain text.
 
-The helper function `to_int()` converts retrieved values into integers before they are stored in `facilities`. If a value is missing or cannot be converted, it returns `None`, keeping the normalized data types consistent across different sources.
+Before the retrieved values are stored in `facilities`, the helper function `to_int()` converts them into integers. If a value is missing or cannot be converted, `to_int()` returns `None`, keeping the normalized data types consistent across different sources.
 
 
 ### Handling Missing Data
 
-Not all sports centers provide a maximum capacity for their facilities. For example, Luzhou and Wugu Sports Centers operated by Chan Chao provide the current number of users but do not provide capacity data.
+Not all sports centers provide a maximum capacity for their facilities. For example, Luzhou (蘆洲) and Wugu (五股) Sports Centers operated by Chan-Chao provide only current number of users but not maximum capacity data.
 
-To handle this consistently, the values in the `facilities` dictionary are initialized as `None`. When a source does not provide a value, each parser updates only the values that are available, while unavailable fields simply remain `None`.
+To handle this consistently, the values in the `facilities` dictionary are initialized to `None`. Whenever a source does not provide a value, each parser updates only the values that are available, letting unavailable fields remain `None`.
 
-Missing capacity values are stored as `None` rather than `0`, because a value of `0` would represent an actual capacity of zero, while `None` means that the source does not provide the information. This distinction also prevents the program from calculating a misleading occupancy percentage when capacity data is unavailable.
+Missing values are stored as `None` rather than `0`, because a value of `0` would represent an actual number of zero, while `None` means that the source does not provide the information. This distinction also prevents the program from calculating a misleading occupancy percentage when capacity data is unavailable.
 
 
 ### Terminal Presentation
 
-The terminal output is rendered with Rich rather than plain `print()` statements. A Rich `Table` keeps facility names, current counts, capacities, occupancy rates, timestamps, and source URLs aligned when multiple sports centers are displayed.
+The terminal output is rendered with Rich rather than plain `print()` statements, because a Rich Table keeps data from multiple sports centers aligned and readable.
 
-Occupancy is calculated as the current number of users divided by the facility capacity. Color-coded bars are used to make different occupancy levels easier to recognize at a glance. The thresholds are presentation choices intended to distinguish low, moderate, high, and over-capacity usage.
+Occupancy is calculated as the current number of users divided by the facility capacity. Color-coded bars are used to make different occupancy levels easier to recognize at a glance.
 
 The source website is also displayed in the table so that users can easily visit the original website and verify the occupancy data.
 
@@ -209,4 +205,4 @@ The source website is also displayed in the table so that users can easily visit
 
 Each CSV row represents one facility at one sports center. Therefore, if a sports center provides a gym, swimming pool, and ice rink, one retrieval produces three rows. This structure allows sports centers with different combinations of facilities to be stored in the same CSV format.
 
-Splitting logs by month prevents a single CSV file from growing indefinitely and makes it easier to organize and analyze historical data by time period.
+Splitting logs by month prevents a single CSV file from growing indefinitely and makes it easier to organize and analyze historical data.
