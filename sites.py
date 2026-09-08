@@ -437,7 +437,3 @@ SITES = [
         "endpoint": {"gym": "https://tmp.ezstore.com.tw/ezrwd/xccs/poolcount.php?site=xinsheng-gym", "swim": "https://tmp.ezstore.com.tw/ezrwd/xccs/poolcount.php?site=xinsheng-pool"}
     },
 ]
-
-
-print("，".join(s["name_zh"] for s in SITES))
-print(len(SITES))
