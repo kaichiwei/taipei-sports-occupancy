@@ -1,5 +1,5 @@
 # Greater Taipei Sports Center Occupancy Aggregator
-#### Video Demo:  <URL HERE>
+#### Video Demo:  https://www.youtube.com/watch?v=j0v2DvOsGi8
 #### Description:
 
 A command-line tool that retrieves live occupancy data from websites of sports centers  across Greater Taipei, normalizes the data into a consistent format, and displays occupancy information for gyms, swimming pools, and ice rinks. The program also saves the retrieved data to CSV files, allowing it to accumulate historical time series.
