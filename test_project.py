@@ -2,18 +2,15 @@ import csv
 
 import pytest
 
-import sites
-import project
 from project import (
     parse_queries,
     match_sites,
-    to_rows,
     save_to_csv,
 )
 
+from sites import SITES
 from parsers import to_int, parse_json, parse_html, parse_text
-
-SITES = sites.SITES
+from csv_storage import FIELDNAMES, to_rows
 
 
 #  -------------------  test parse_queries() -----------------
@@ -275,7 +272,7 @@ def test_to_rows_yields_one_row_per_facility():
 
 
 def test_to_rows_keys_match_fieldnames():
-    assert set(next(to_rows(RECORD))) == set(project.FIELDNAMES)
+    assert set(next(to_rows(RECORD))) == set(FIELDNAMES)
 
 
 #  -------------------  test save_to_csv() ------------------
