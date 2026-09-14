@@ -7,7 +7,6 @@ import project
 from project import (
     parse_queries,
     match_sites,
-    to_int,
     parse_json,
     parse_html,
     parse_text,
@@ -15,6 +14,7 @@ from project import (
     save_to_csv,
 )
 
+from parsers import to_int
 
 SITES = sites.SITES
 
