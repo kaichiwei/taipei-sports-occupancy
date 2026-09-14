@@ -3,10 +3,10 @@ from rich.progress_bar import ProgressBar
 from rich.table import Table
 
 from sites import SITES
+from models import OccupancyRecord
 
-
-def build_table(record: dict) -> Table:
-    table = Table(box=None, title=f"{record["name_zh"]} {record["name_en"]}", 
+def build_table(record: OccupancyRecord) -> Table:
+    table = Table(box=None, title=f"{record.name_zh} {record.name_en}", 
                   title_style="bold white on gray23", show_footer=True)
     table.add_column("設施 Facility", justify="center")
     table.add_column("現在人數 Current", justify="right")
@@ -27,8 +27,8 @@ def print_to_cla(unknown_terms, records) -> None:
     console = Console()
     for record in records:
         table = build_table(record)
-        for facility in record["facilities"]:
-            cur, cap = record["facilities"][facility][:2]
+        for facility in record.facilities:
+            cur, cap = record.facilities[facility][:2]
             if cur is not None:
                 if cap is None:
                     table.add_row(f"{key.get(facility)} {facility}", f"{cur:>4}", "-", "-",)
@@ -43,7 +43,7 @@ def print_to_cla(unknown_terms, records) -> None:
                         f"[bold {style}]{ratio:.0%}[/]"
                     )
 
-        table.caption = f"[dim italic gray23]time: {record['timestamp']}\nwebsite: {record['website']}[/]"
+        table.caption = f"[dim italic gray23]time: {record.timestamp}\nwebsite: {record.website}[/]"
         table.caption_justify = "right"
         console.print(table)
         print()

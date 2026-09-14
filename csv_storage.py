@@ -3,20 +3,25 @@ import csv
 from typing import Iterator
 from pathlib import Path
 from collections import defaultdict
-
+from models import OccupancyRecord
 
 FIELDNAMES = ["timestamp", "city", "name_zh", "name_en", "facility", "current", "capacity"]
 
-def to_rows(record: dict) -> Iterator[dict]:
-    base = {k: record[k] for k in ("timestamp", "city", "name_zh", "name_en")}
-    for facility, (cur, cap) in record["facilities"].items():
+def to_rows(record: OccupancyRecord) -> Iterator[dict]:
+    base = {
+        "timestamp": record.timestamp,
+        "city": record.city,
+        "name_zh": record.name_zh,
+        "name_en": record.name_en
+    }
+    for facility, (cur, cap) in record.facilities.items():
         yield {**base, "facility": facility, "current": cur, "capacity": cap}
 
 
-def save_to_csv(records: list[dict]) -> None:
+def save_to_csv(records: list[OccupancyRecord]) -> None:
     rows_by_path = defaultdict(list)
     for record in records:
-        csv_path = Path("data") / f"log_{record["timestamp"][:7]}.csv"
+        csv_path = Path("data") / f"log_{record.timestamp[:7]}.csv"
         for row in to_rows(record):
             if row["current"] is not None:
                 rows_by_path[csv_path].append(row)

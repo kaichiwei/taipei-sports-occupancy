@@ -1,9 +1,7 @@
 import truststore  # pyright: ignore[reportMissingImports]
-
 truststore.inject_into_ssl()  # 放在 import requests 之前的最開頭，加了這個之後不用手動匯出憑證
 
 # the stander import order: standard library -> third party library -> local library
-
 from sys import stderr
 import time
 
@@ -14,6 +12,7 @@ from occupancy import get_occupancy
 from terminal import print_to_cla
 from csv_storage import save_to_csv
 from site_lookup import parse_queries, match_sites
+from models import OccupancyRecord
 
 
 def main():
@@ -36,12 +35,14 @@ def main():
             print(f"{site['name_zh']} 解析失敗: {e}", file=stderr)
             continue
 
-        record = {
-            "timestamp": current_time,  "city": site["city"], 
-            "name_zh": site["name_zh"], "name_en": site["name_en"], 
-            "facilities": facilities,
-            "website": site["web"],
-        }
+        record = OccupancyRecord(
+            timestamp = current_time,
+            city = site["city"], 
+            name_zh = site["name_zh"], 
+            name_en = site["name_en"], 
+            facilities = facilities,
+            website = site["web"],
+        )
         records.append(record)
     
     print_to_cla(unknown_terms, records)

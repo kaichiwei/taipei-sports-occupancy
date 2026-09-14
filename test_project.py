@@ -11,7 +11,7 @@ from project import (
 from sites import SITES
 from parsers import to_int, parse_json, parse_html, parse_text
 from csv_storage import FIELDNAMES, to_rows
-
+from models import OccupancyRecord
 
 #  -------------------  test parse_queries() -----------------
 @pytest.mark.parametrize("queries,expected", [
@@ -253,17 +253,23 @@ class TestParse:
 
 
 # --------------------  test to_rows() ----------------------
-RECORD = {
-    "timestamp": "2026-08-21 10:00:00",
-    "city": "NTPC",
-    "name_zh": "中和",
-    "name_en": "Zhonghe",
-    "facilities": {"gym": [44, 100], "pool": [3, 150], "rink": [None, None]},
-}
+RECORD = OccupancyRecord(
+    timestamp = "2026-08-21 10:00:00",
+    city = "NTPC",
+    name_zh = "中和",
+    name_en = "Zhonghe",
+    facilities = {"gym": [44, 100], "pool": [3, 150], "rink": [None, None]},
+    website = "https://example.tw"
+)
 
 
 def test_to_rows_yields_one_row_per_facility():
-    base = {"timestamp": "2026-08-21 10:00:00", "city": "NTPC", "name_zh": "中和", "name_en": "Zhonghe"}
+    base = {
+        "timestamp": RECORD.timestamp,
+        "city": RECORD.city,
+        "name_zh": RECORD.name_zh, 
+        "name_en": RECORD.name_en
+    }
     assert list(to_rows(RECORD)) == [
         {**base, "facility": "gym", "current": 44, "capacity": 100},
         {**base, "facility": "pool", "current": 3, "capacity": 150},
@@ -277,11 +283,14 @@ def test_to_rows_keys_match_fieldnames():
 
 #  -------------------  test save_to_csv() ------------------
 def make_record(timestamp, city, name_zh, name_en, gym, pool, rink):
-    return {
-        "timestamp": timestamp, "city": city,
-        "name_zh": name_zh, "name_en": name_en,
-        "facilities": {"gym": gym, "pool": pool, "rink": rink},
-    }
+    return OccupancyRecord(
+        timestamp= timestamp,
+        city= city,
+        name_zh= name_zh,
+        name_en= name_en,
+        facilities= {"gym": gym, "pool": pool, "rink": rink},
+        website= "https://example.tw"
+    )
 
 # 同一個月，資料類別不同
 # 2 rows
