@@ -17,8 +17,7 @@ from rich.progress_bar import ProgressBar
 from rich.table import Table
 
 import sites
-from parsers import parse_json, parse_html, parse_text
-from fetchers import fetch 
+from occupancy import get_occupancy
 
 
 ALL_SITES = sites.SITES
@@ -38,16 +37,7 @@ def main():
     for site in selected_sites:
         current_time = time.strftime("%Y-%m-%d %H:%M:%S")
         try:
-            data = fetch(site)
-            match site["mode"], data:
-                case "json", dict():
-                    facilities = parse_json(site, data)
-                case "html", str():
-                    facilities = parse_html(site, data)
-                case "text", str():
-                    facilities = parse_text(site, data)
-                case _:
-                    raise NotImplementedError(f"mode {site['mode']!r} 與回應型別 {type(data).__name__} 不相符")
+            facilities = get_occupancy(site)
         except NotImplementedError as e:
             print(f"{site['name_zh']} 設定不完整: {e}", file=stderr)
             continue
@@ -57,6 +47,7 @@ def main():
         except (ValueError, KeyError, AttributeError) as e:
             print(f"{site['name_zh']} 解析失敗: {e}", file=stderr)
             continue
+
         record = {
             "timestamp": current_time,  "city": site["city"], 
             "name_zh": site["name_zh"], "name_en": site["name_en"], 
