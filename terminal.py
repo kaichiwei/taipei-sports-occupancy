@@ -27,8 +27,9 @@ def print_to_cla(unknown_terms, records) -> None:
     console = Console()
     for record in records:
         table = build_table(record)
-        for facility in record.facilities:
-            cur, cap = record.facilities[facility][:2]
+        for facility, reading in record.facilities.items():
+            cur = reading.current
+            cap = reading.capacity
             if cur is not None:
                 if cap is None:
                     table.add_row(f"{key.get(facility)} {facility}", f"{cur:>4}", "-", "-",)

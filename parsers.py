@@ -1,6 +1,6 @@
 import re
 import json
-
+from models import FacilityReading
 
 FACILITY_BY_CATEGORY = {
     "健身房": "gym", "體適能中心": "gym", "游泳池": "pool", "冰宮": "rink",
@@ -41,8 +41,13 @@ def parse_json(site: dict, data: dict) -> dict:
                 if key := FACILITY_BY_CATEGORY.get(court["courtCatTitle"]):
                     facilities[key] = [court["currCapacity"], court["upperBound"]]
 
-    facilities = {k: [to_int(x) for x in v] for k, v in facilities.items()}
-    return facilities
+    return {
+        k: FacilityReading(
+            current= to_int(v[0]), 
+            capacity= to_int(v[1])
+            )
+        for k, v in facilities.items()
+    }
 
 
 def parse_html(site: dict, html: str) -> dict:
@@ -66,8 +71,13 @@ def parse_html(site: dict, html: str) -> dict:
             if key := FACILITY_BY_CATEGORY.get(field["cat"]):
                 facilities[key] = [field.get("cur"), field.get("cap")]
     
-    facilities = {k: [to_int(x) for x in v] for k, v in facilities.items()}
-    return facilities
+    return {
+        k: FacilityReading(
+            current= to_int(v[0]), 
+            capacity= to_int(v[1])
+            )
+        for k, v in facilities.items()
+    }
 
 
 def parse_text(site: dict, text: str) -> dict:
@@ -84,5 +94,10 @@ def parse_text(site: dict, text: str) -> dict:
     facilities["gym"] = [gym_current, site["CAPACITY"]["gym"]]
     facilities["pool"] = [pool_current, site["CAPACITY"]["swim"]]
 
-    facilities = {k: [to_int(x) for x in v] for k, v in facilities.items()}
-    return facilities
+    return {
+        k: FacilityReading(
+            current= to_int(v[0]), 
+            capacity= to_int(v[1])
+            )
+        for k, v in facilities.items()
+    }

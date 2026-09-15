@@ -11,7 +11,7 @@ from project import (
 from sites import SITES
 from parsers import to_int, parse_json, parse_html, parse_text
 from csv_storage import FIELDNAMES, to_rows
-from models import OccupancyRecord
+from models import OccupancyRecord, FacilityReading
 
 #  -------------------  test parse_queries() -----------------
 @pytest.mark.parametrize("queries,expected", [
@@ -142,9 +142,9 @@ class TestParse:
                     {"courtCatTitle":"體適能中心","upperBound":60,"currCapacity":16,"capacityControl":1}]
             }
             assert parse_json(SITE_XPORTS, data) == {
-                "gym": [16, 60],
-                "pool": [107, 300],
-                "rink": [None, None]
+                "gym": FacilityReading(16, 60),
+                "pool": FacilityReading(107, 300),
+                "rink": FacilityReading(None, None)
             }
 
         def test_parse_json_cyc(self):
@@ -156,15 +156,15 @@ class TestParse:
             }
             data = {"gym":["44","100","0"],"swim":["3","150","0"],"ice":["217","250","0"]}
             assert parse_json(SITE_CYC, data) == {
-                "gym": [44, 100],
-                "pool": [3, 150],
-                "rink": [217, 250]
+                "gym": FacilityReading(44, 100),
+                "pool": FacilityReading(3, 150),
+                "rink": FacilityReading(217, 250)
             }
             data = {"gym":["44","100","0"],"swim":["3","150","0"]}
             assert parse_json(SITE_CYC, data) == {
-                "gym": [44, 100],
-                "pool": [3, 150],
-                "rink": [None, None]
+                "gym": FacilityReading(44, 100),
+                "pool": FacilityReading(3, 150),
+                "rink": FacilityReading(None, None)
             }
 
 #  ------------------- test parse_html() -------------------
@@ -182,9 +182,9 @@ class TestParse:
                     r'JSON.parse("[ \r\n  {\r\n    \"MachineName\": \"游泳池\",\r\n    \"MaxQty\": 400,\r\n    \"UseQty\": 132\r\n  }, ' \
                     r'\r\n  {\r\n    \"MachineName\": \"健身房\",\r\n    \"MaxQty\": 100,\r\n    \"UseQty\": 27\r\n  } \r\n]")'
             assert parse_html(SITE_FULLHOUSE, source) == {
-                "gym": [27, 100],
-                "pool": [132, 400],
-                "rink": [None, None]
+                "gym": FacilityReading(27, 100),
+                "pool": FacilityReading(132, 400),
+                "rink": FacilityReading(None, None)
             }
 
         def test_parse_html_cjme(self):
@@ -198,9 +198,9 @@ class TestParse:
             source = '健身房<span class="stadium-info_number">25</span>人/ 容留<span>80人' \
                     '游泳池<span class="stadium-info_number">67</span>人/ 容留<span>250人'
             assert parse_html(SITE_cjme, source) == {
-                "gym": [25, 80],
-                "pool": [67, 250],
-                "rink": [None, None]
+                "gym": FacilityReading(25, 80),
+                "pool": FacilityReading(67, 250),
+                "rink": FacilityReading(None, None)
             }
 
         def test_parse_html_ws(self):
@@ -214,9 +214,9 @@ class TestParse:
             source = '健身房<div class="notice">47</div>人  <span>容留80人</span>' \
                     '游泳池<div class="notice">173</div>人 <span>容留250人</span>'
             assert parse_html(SITE_ws, source) == {
-                "gym": [47, 80],
-                "pool": [173, 250],
-                "rink": [None, None]
+                "gym": FacilityReading(47, 80),
+                "pool": FacilityReading(173, 250),
+                "rink": FacilityReading(None, None)
             }
 
 #  ------------------- test parse_text() -------------------
@@ -231,9 +231,9 @@ class TestParse:
             }
             text = '99, 199'
             assert parse_text(SITE_elite, text) == {
-                "gym": [99, 100],
-                "pool": [199, 200],
-                "rink": [None, None]
+                "gym": FacilityReading(99, 100),
+                "pool": FacilityReading(199, 200),
+                "rink": FacilityReading(None, None)
             }
  
         def test_parse_text_elite_Shulin(self):    
@@ -246,9 +246,9 @@ class TestParse:
             }
             text = '199, 99'
             assert parse_text(SITE_elite, text) == {
-                "gym": [99, 100],
-                "pool": [199, 200],
-                "rink": [None, None]
+                "gym": FacilityReading(99, 100),
+                "pool": FacilityReading(199, 200),
+                "rink": FacilityReading(None, None)
             }
 
 
@@ -258,7 +258,10 @@ RECORD = OccupancyRecord(
     city = "NTPC",
     name_zh = "中和",
     name_en = "Zhonghe",
-    facilities = {"gym": [44, 100], "pool": [3, 150], "rink": [None, None]},
+    facilities = {"gym": FacilityReading(current= 44, capacity= 100), 
+                  "pool": FacilityReading(current= 3, capacity= 150),
+                  "rink": FacilityReading(current= None, capacity= None)
+                },
     website = "https://example.tw"
 )
 
@@ -294,19 +297,40 @@ def make_record(timestamp, city, name_zh, name_en, gym, pool, rink):
 
 # 同一個月，資料類別不同
 # 2 rows
-TWO_FACILITIES = make_record("2026-08-21 10:00:00", "NTPC", "中和", "Zhonghe", [44, 100], [3, 150], [None, None])
+TWO_FACILITIES = make_record(
+    "2026-08-21 10:00:00", "NTPC", "中和", "Zhonghe", 
+    FacilityReading(44, 100), FacilityReading(3, 150), FacilityReading(None, None)
+)
 # 3 rows
-THREE_FACILITIES = make_record("2026-08-22 19:58:43", "NTPC", "土城", "Tucheng", [33, 120], [159, 280], [36, 250])
+THREE_FACILITIES = make_record(
+    "2026-08-22 19:58:43", "NTPC", "土城", "Tucheng", 
+    FacilityReading(33, 120), FacilityReading(159, 280), FacilityReading(36, 250)
+)
 # 2 rows
-NONE_CAP = make_record("2026-08-01 05:16:28", "TPE", "大同", "Datong", [55, None], [116, None], [None, None]
+NONE_CAP = make_record(
+    "2026-08-01 05:16:28", "TPE", "大同", "Datong", 
+    FacilityReading(55, None), FacilityReading(116, None), FacilityReading(None, None)
 )
 # 0 rows
-NONE_CUR = make_record("2026-08-15 01:47:15", "Nantou", "集集", "Jiji", [None, 120], [None, 250], [None, None])
+NONE_CUR = make_record(
+    "2026-08-15 01:47:15", "Nantou", "集集", "Jiji", 
+    FacilityReading(None, 120), FacilityReading(None, 250), FacilityReading(None, None)
+)
 # 2 rows
-ZERO_CUR = make_record("2026-08-08 10:30:00", "NTPC", "蘆洲", "Luzhou", [0, 120], [0, 250], [None, None])
+ZERO_CUR = make_record(
+    "2026-08-08 10:30:00", "NTPC", "蘆洲", "Luzhou", 
+    FacilityReading(0, 120), FacilityReading(0, 250), FacilityReading(None, None)
+)
 # 隔一天但跨月
-THIS_MONTH = make_record("2026-08-31 23:59:59", "NTPC", "新莊", "Xinzhuang", [10, 100], [20, 200], [None, None])
-NEXT_MONTH  = make_record("2026-09-01 00:00:01", "NTPC", "新莊", "Xinzhuang", [11, 100], [21, 200], [None, None])
+THIS_MONTH = make_record(
+    "2026-08-31 23:59:59", "NTPC", "新莊", "Xinzhuang", 
+    FacilityReading(10, 100), FacilityReading(20, 200), FacilityReading(None, None)
+)
+NEXT_MONTH  = make_record(
+    "2026-09-01 00:00:01", "NTPC", "新莊", "Xinzhuang", 
+    FacilityReading(11, 100), FacilityReading(21, 200), FacilityReading(None, None)
+)
+
 
 class TestSaveCSV:
     def test_save_to_csv_all_none_cur_creates_no_file(self, tmp_path, monkeypatch):
