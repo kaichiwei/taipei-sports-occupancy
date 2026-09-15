@@ -1,5 +1,5 @@
-from fetchers import fetch
-from parsers import parse_json, parse_html, parse_text
+from .fetchers import fetch
+from .parsers import parse_json, parse_html, parse_text
 
 
 def get_occupancy(site: dict) -> dict:

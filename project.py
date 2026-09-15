@@ -7,12 +7,12 @@ import time
 
 import requests
 
-from sites import SITES
-from occupancy import get_occupancy
-from terminal import print_to_cla
-from csv_storage import save_to_csv
-from site_lookup import parse_queries, match_sites
-from models import OccupancyRecord
+from taipei_sports_occupancy.sites import SITES
+from taipei_sports_occupancy.occupancy import get_occupancy
+from taipei_sports_occupancy.terminal import print_to_cla
+from taipei_sports_occupancy.csv_storage import save_to_csv
+from taipei_sports_occupancy.site_lookup import parse_queries, match_sites
+from taipei_sports_occupancy.models import OccupancyRecord
 
 
 def main():

@@ -1,6 +1,6 @@
 import re
 import json
-from models import FacilityReading
+from .models import FacilityReading
 
 FACILITY_BY_CATEGORY = {
     "健身房": "gym", "體適能中心": "gym", "游泳池": "pool", "冰宮": "rink",

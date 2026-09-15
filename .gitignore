@@ -1,3 +1,4 @@
+# 虛擬環境
 .venv/
 venv/
 env/
@@ -7,19 +8,33 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# 測試與 lint 快取
-.pytest_cache/
-.ruff_cache/
-.coverage
+
+# Python package / build 產物 
+*.egg-info/ 
+build/ 
+dist/
+
+
+# 測試、型別檢查與 lint 快取 
+.pytest_cache/ 
+.mypy_cache/ 
+.pyright/ 
+.ruff_cache/ 
+.coverage 
+.coverage.* 
 htmlcov/
+
 
 # 抓取到的資料（保留一個範例檔）
 data/*.csv
 !data/sample_occupancy.csv
 
+
 # 環境變數 / 密鑰
 .env
+.env.*
 *.key
+
 
 # 編輯器與作業系統
 .vscode/

@@ -2,8 +2,8 @@ from rich.console import Console
 from rich.progress_bar import ProgressBar
 from rich.table import Table
 
-from sites import SITES
-from models import OccupancyRecord
+from .sites import SITES
+from .models import OccupancyRecord
 
 def build_table(record: OccupancyRecord) -> Table:
     table = Table(box=None, title=f"{record.name_zh} {record.name_en}", 

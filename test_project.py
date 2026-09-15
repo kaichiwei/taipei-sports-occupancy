@@ -8,10 +8,11 @@ from project import (
     save_to_csv,
 )
 
-from sites import SITES
-from parsers import to_int, parse_json, parse_html, parse_text
-from csv_storage import FIELDNAMES, to_rows
-from models import OccupancyRecord, FacilityReading
+from taipei_sports_occupancy.sites import SITES
+from taipei_sports_occupancy.parsers import to_int, parse_json, parse_html, parse_text
+from taipei_sports_occupancy.csv_storage import FIELDNAMES, to_rows
+from taipei_sports_occupancy.models import OccupancyRecord, FacilityReading
+
 
 #  -------------------  test parse_queries() -----------------
 @pytest.mark.parametrize("queries,expected", [
