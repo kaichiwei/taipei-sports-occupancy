@@ -16,7 +16,7 @@ def build_table(record: OccupancyRecord) -> Table:
     return table
     
 
-def print_to_cla(unknown_terms, records) -> None:
+def print_to_cli(unknown_terms, records) -> None:
     if unknown_terms:
         print(f'\n找不到場館：{"、".join(unknown_terms)}\n')
         print(f'Cannot find sites: {", ".join(unknown_terms)}\n')
