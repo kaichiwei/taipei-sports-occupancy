@@ -13,9 +13,10 @@ from taipei_sports_occupancy.terminal import print_to_cli
 from taipei_sports_occupancy.csv_storage import save_to_csv
 from taipei_sports_occupancy.site_lookup import parse_queries, match_sites
 from taipei_sports_occupancy.models import OccupancyRecord
-
+from taipei_sports_occupancy.db_storage import init_db, save_to_db
 
 def main():   
+    init_db()
     queries = input("選擇場館： ").strip()
     tokens = parse_queries(queries)
     selected_sites, unknown_terms = match_sites(tokens, SITES)    
@@ -24,6 +25,7 @@ def main():
     
     print_to_cli(unknown_terms, records)
     save_to_csv(records)
+    save_to_db(records)
 
 
 def make_records(selected_sites: list[dict]) -> list[OccupancyRecord]:
