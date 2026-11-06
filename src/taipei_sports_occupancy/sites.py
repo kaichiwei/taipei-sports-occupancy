@@ -437,3 +437,29 @@ SITES = [
         "endpoint": {"gym": "https://tmp.ezstore.com.tw/ezrwd/xccs/poolcount.php?site=xinsheng-gym", "swim": "https://tmp.ezstore.com.tw/ezrwd/xccs/poolcount.php?site=xinsheng-pool"}
     },
 ]
+
+venue_names_zh = [
+    "大安", "大同", "中正", "松山", "萬華",
+    "南港", "中山", "內湖", "文山", "信義",
+    "北投", "士林", "新生",
+    "板橋", "新店", "淡水", "泰山", "蘆洲",
+    "五股", "汐止", "永和", "林口", "三峽",
+    "鶯歌", "台北大學", "中和", "新莊", "樹林",
+    "三重", "土城",
+    "蘆竹", "楊梅", "桃園", "中壢", "八德",
+    "竹光", "朝馬", "北屯"
+]
+
+venue_names_en = [
+    "Daan", "Datong", "Zhongzheng", "Songshan", "Wanhua",
+    "Nangang", "Zhongshan", "Neihu", "Wenshan", "Xinyi",
+    "Beitou", "Shilin", "Xinsheng",
+    "Banqiao", "Xindian", "Tamsui", "Taishan", "Luzhou",
+    "Wugu", "Xizhi", "Yonghe", "Linkou", "Sanxia",
+    "Yingge", "NTPU", "Zhonghe", "Xinzhuang", "Shulin",
+    "Sanchong", "Tucheng",
+    "Luzhu", "Yangmei", "Taoyuan", "Zhongli", "Bade",
+    "Zhuguang", "Chaoma", "Beitun"
+]
+
+total_number = 38
