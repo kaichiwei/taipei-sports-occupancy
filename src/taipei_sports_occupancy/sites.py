@@ -462,4 +462,4 @@ venue_names_en = [
     "Zhuguang", "Chaoma", "Beitun"
 ]
 
-total_number = 38
+total_number = len(venue_names_zh)
