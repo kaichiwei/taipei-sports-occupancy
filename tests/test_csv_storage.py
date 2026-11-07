@@ -1,8 +1,6 @@
 import csv
 
-from project import save_to_csv
-
-from taipei_sports_occupancy.csv_storage import FIELDNAMES, to_rows
+from taipei_sports_occupancy.csv_storage import FIELDNAMES, to_rows, save_to_csv
 from taipei_sports_occupancy.models import OccupancyRecord, FacilityReading
 
 
